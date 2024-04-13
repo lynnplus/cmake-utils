@@ -1,0 +1,55 @@
+
+#ifndef @INCLUDE_GUARD_NAME@
+#define @INCLUDE_GUARD_NAME@
+
+#ifdef __GNUC__
+    #if __GNUC__ >= 4
+        #define @LIB_MACRO_NAME@_DECLARE_ATTRIBUTE(value) __attribute__((value))
+    #else
+        #define @LIB_MACRO_NAME@_DECLARE_ATTRIBUTE(value)
+    #endif
+#else // __GNUC__
+    #define @LIB_MACRO_NAME@_DECLARE_ATTRIBUTE(value) __declspec(value)
+#endif //__GNUC__
+
+
+#if !defined(@LIB_MACRO_NAME@_DECLARE_PUBLIC) && !defined(@LIB_MACRO_NAME@_DECLARE_PRIVATE)
+    #if defined _WIN32 || defined __CYGWIN__
+        #define @LIB_MACRO_NAME@_DECLARE_PUBLIC @LIB_MACRO_NAME@_DECLARE_ATTRIBUTE(dllexport)
+        #define @LIB_MACRO_NAME@_DECLARE_PRIVATE
+        #define @LIB_MACRO_NAME@_DECLARE_IMPORT @LIB_MACRO_NAME@_DECLARE_ATTRIBUTE(dllimport)
+    #else // _WIN32 || __CYGWIN__
+        #define @LIB_MACRO_NAME@_DECLARE_PUBLIC @LIB_MACRO_NAME@_DECLARE_ATTRIBUTE(visibility("default"))
+        #define @LIB_MACRO_NAME@_DECLARE_PRIVATE @LIB_MACRO_NAME@_DECLARE_ATTRIBUTE(visibility("hidden"))
+        #define @LIB_MACRO_NAME@_DECLARE_IMPORT @LIB_MACRO_NAME@_DECLARE_PUBLIC
+    #endif
+#endif /*!defined(@LIB_MACRO_NAME@_DECLARE_PUBLIC) && !defined(@LIB_MACRO_NAME@_DECLARE_PRIVATE)*/
+
+#ifdef @STATIC_DEFINE@
+    #define @EXPORT_MACRO_NAME@
+    #define @NO_EXPORT_MACRO_NAME@
+#else //@STATIC_DEFINE@
+    #ifndef @EXPORT_MACRO_NAME@
+        #ifdef @EXPORT_IMPORT_CONDITION@
+            #define @EXPORT_MACRO_NAME@ @LIB_MACRO_NAME@_DECLARE_PUBLIC
+        #else
+            #define @EXPORT_MACRO_NAME@ @LIB_MACRO_NAME@_DECLARE_IMPORT
+        #endif
+    #endif //@EXPORT_MACRO_NAME@
+
+    #ifndef @NO_EXPORT_MACRO_NAME@
+        #define @NO_EXPORT_MACRO_NAME@ @LIB_MACRO_NAME@_DECLARE_PRIVATE
+    #endif
+#endif /* @STATIC_DEFINE@ */
+
+#ifndef @DEPRECATED_MACRO_NAME@
+    #if defined _WIN32 || defined __CYGWIN__
+        #define @DEPRECATED_MACRO_NAME@ @LIB_MACRO_NAME@_DECLARE_ATTRIBUTE(deprecated)
+    #else
+        #define @DEPRECATED_MACRO_NAME@ @LIB_MACRO_NAME@_DECLARE_ATTRIBUTE(__deprecated__)
+    #endif
+#endif
+
+@CUSTOM_CONTENT@
+
+#endif /* @INCLUDE_GUARD_NAME@ */
